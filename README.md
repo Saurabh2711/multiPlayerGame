@@ -1,25 +1,15 @@
 
-# Socket.IO Chat
+# MultiPlayer Game using Socket.io and nodeJS 
 
-A simple chat demo for socket.io
 
-## How to use
+## How to play
 
 ```
-$ cd socket.io
-$ npm install
-$ cd examples/chat
+$ git clone https://github.com/Saurabh2711/multiPlayerGame.git
+$ cd multiPlayerGame
 $ npm install
 $ node .
 ```
 
-And point your browser to `http://localhost:3000`. Optionally, specify
-a port by supplying the `PORT` env variable.
+And point your browser to `http://localhost:3000`
 
-## Features
-
-- Multiple users can join a chat room by each entering a unique username
-on website load.
-- Users can type chat messages to the chat room.
-- A notification is sent to all users when a user joins or leaves
-the chatroom.
