@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Bootstrap 3, from LayoutIt!</title>
+
+    <meta name="description" content="Source code generated using layoutit.com">
+    <meta name="author" content="LayoutIt!">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+  </head>
+  <body>
+
+    <div class="container-fluid">
+	<div class="row">
+		<div class="col-md-4">
+			<div class="row">
+				<div class="col-md-12">
+				    
+					<button id="createGame" type="button" class="btn btn-default">
+						CreateGame
+					</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<h3>
+						Online Users
+					</h3>
+					<p>
+						user1
+					</p>
+					<div>
+						user2
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="row">
+				<div class="col-md-12">
+					<h3>
+						Challenge
+					</h3>
+                    <h2 id="gameDisplay"></h2>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					 <input type="text" id="inputAns" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					 
+					<button type="button" class="btn btn-default">
+						Default
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="row">
+				<div class="col-md-12">
+					 
+					<h3>
+						Your Game
+					</h3>
+					
+					<div class="row">
+						<div id="youGameList" class="col-md-12">
+                            <button id="startGame" type="button" class="btn btn-default">
+						          Start Game
+					       </button>
+                            <button id="closeGame" type="button" class="btn btn-danger">End Game
+                            </button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+                <h3>Game Rooms</h3>
+				<div id="onlineGameRooms" class="col-md-12">
+					 
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+  <script src="/main2.js"></script>
+  </body>
+</html>
