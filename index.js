@@ -14,7 +14,7 @@ var players=[];
 var a,b;
 var score=100;
 var gameRooms=[];
-
+var gamers_username={};
 io.on('connection', function (socket) {
     console.log("Player Connected");
     //send unique id to client (perticular client)
@@ -25,6 +25,12 @@ io.on('connection', function (socket) {
     
     //
     var created=0;
+    
+    socket.on("setUsername",function(data){
+       console.log(socket.id+"  :  "+data.username);
+       gamers_username[socket.id]=data.username; 
+    });
+    
     socket.on('createGame',function(data){
         console.log("createGame Recieved");
         if(created==1)
@@ -32,7 +38,9 @@ io.on('connection', function (socket) {
         else
         {
             created++;
+            
             socket.join(data.room);
+            sendRoomUsers(data);
             console.log(data.room);
             getUsersInRoomNumber(data.room);
             gameRooms.push({room:data.room,name:data.name});
@@ -55,7 +63,8 @@ io.on('connection', function (socket) {
             gameRooms.splice(index,1);
         io.emit("showGameRooms",gameRooms);
         created--;
-        io.sockets.in(data.room).emit('afterCloseOperation');
+        //io.sockets.in(data.room).emit('afterCloseOperation');
+        socket.emit('afterCloseOperation');
     }
     
     socket.on('closeGame',function(data){
@@ -76,12 +85,20 @@ io.on('connection', function (socket) {
         
         var a=Math.round(Math.random()*100);
         var b=Math.round(Math.random()*100);
-        io.sockets.in(data.room).emit('setOnMark',{time:10000,a:a,b:b});
+        io.sockets.in(data.room).emit('setOnMark',{time:10000,a:a,b:b,room:data.room});
         closeGamefun(data);
     }
     
     socket.on('answerRecieve',function(data){
-       console.log(data); 
+       console.log(data);
+       if(data.a+data.b==data.ans)
+            socket.emit("yourScore",{score:100});
+       else
+            socket.emit("yourScore",{score:0});
+    });
+    
+    socket.on("leaveRoom",function(data){
+       socket.leave(data.room); 
     });
     socket.on('startGame',function(data){
         console.log("start game request recieved");
@@ -96,9 +113,20 @@ io.on('connection', function (socket) {
         console.log("start game request recieved "+x);
     });
     
+    function sendRoomUsers(data)
+    {
+        var userInThisRoom=[];
+        for(var clients in io.nsps['/'].adapter.rooms[data.room].sockets)
+        {
+            console.log(clients+" : "+gamers_username[clients]);
+            userInThisRoom.push(gamers_username[clients]);
+        }
+        io.sockets.in(data.room).emit('displyUserInThisRoom',userInThisRoom);
+    }
     socket.on("joinThisRoom",function(data){
        socket.join(data.room);
         console.log("join: "+data.room);
+        sendRoomUsers(data);
        var x=getUsersInRoomNumber(data.room);
        console.log(data.room+" : "+x);
         if(x>=4)
@@ -118,6 +146,7 @@ io.on('connection', function (socket) {
     
     
     //start Recieving
+    /*
     socket.on('start_Game',function(){
         a=Math.round(Math.random()*100);
         b=Math.round(Math.random()*100);
@@ -153,7 +182,7 @@ io.on('connection', function (socket) {
     });
     
     
-    
+    */
     //Handles disconnection of player
     socket.on('disconnect',function(){
        console.log("Player Disconnected"); 
@@ -162,12 +191,10 @@ io.on('connection', function (socket) {
     });
     
     players.push(socket.id);
+    function removePlayer(id)
+    {
+        for(var i=0;i<players.length;++i)
+            if(players[i]==id)
+                players.splice(i,1);
+    }
 });
-
-
-function removePlayer(id)
-{
-    for(var i=0;i<players.length;++i)
-        if(players[i]==id)
-            players.splice(i,1);
-}
