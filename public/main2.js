@@ -12,8 +12,10 @@ $(function() {
     $userInThisRoom=$("#userInThisRoom");
     $closeGameButton.hide();
     $startGameButton.hide();
+    var previousText="Join the game";
     $inputAns.hide();
     var socket = io();
+    var gameCreated=false;
     var username=prompt("Please enter Username", "Vegeta");
     if(username==null)
         username="vegeta";
@@ -30,6 +32,8 @@ $(function() {
         $closeGameButton.show();
         $startGameButton.show();
         $("#onlineUserTitle").html("Users online in gameroom: "+gamename);
+        previousText="Users online in gameroom: "+gamename;
+        gameCreated=true;
         $("#yourGameTitle").html(gamename);
     });
     
@@ -66,6 +70,7 @@ $(function() {
             $gameDisplayDiv.html("");
             $userInThisRoom.html("");
             $("#onlineUserTitle").html("Users online in gameroom: "+data.name);
+            
             };
         toelement.append(element).append("</br>");
     }
@@ -93,7 +98,9 @@ $(function() {
     socket.on("yourScore",function(data){
         $gameDisplayDiv.html("Your Score: "+data.score);
         $userInThisRoom.html("");
-        $("#onlineUserTitle").html("Join the Game");
+        $("#onlineUserTitle").html(previousText);
+        if(gameCreated)
+           $userInThisRoom.html(username);
         
         socket.emit("leaveRoom",data);
     })
@@ -146,6 +153,8 @@ $(function() {
        $startGameButton.hide();
        $closeGameButton.hide();
         $("#yourGameTitle").html("No Game");
+        previousText="Join the game";
+        gameCreated=false;
         console.log("After close "); 
     });
     
