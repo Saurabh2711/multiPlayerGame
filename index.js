@@ -63,12 +63,15 @@ io.on('connection', function (socket) {
             gameRooms.splice(index,1);
         io.emit("showGameRooms",gameRooms);
         created--;
-        //io.sockets.in(data.room).emit('afterCloseOperation');
-        socket.emit('afterCloseOperation');
+        
+        socket.emit('afterCloseOperation',data);
     }
     
     socket.on('closeGame',function(data){
+        
         closeGamefun(data);
+        io.sockets.in(data.room).emit('afterCloseOperation_room',data);
+        //io.sockets.in(data.room).leave(data.room);
     });
     
     
@@ -92,13 +95,15 @@ io.on('connection', function (socket) {
     socket.on('answerRecieve',function(data){
        console.log(data);
        if(data.a+data.b==data.ans)
-            socket.emit("yourScore",{score:100});
+            socket.emit("yourScore",{score:100,room:data.room});
        else
-            socket.emit("yourScore",{score:0});
+            socket.emit("yourScore",{score:0,room:data.room});
     });
     
     socket.on("leaveRoom",function(data){
-       socket.leave(data.room); 
+       socket.leave(data.room);
+        console.log("leaveRoom");
+        getUsersInRoomNumber(data.room);
     });
     socket.on('startGame',function(data){
         console.log("start game request recieved");
@@ -123,6 +128,31 @@ io.on('connection', function (socket) {
         }
         io.sockets.in(data.room).emit('displyUserInThisRoom',userInThisRoom);
     }
+    
+    function closeGamefun_auto(data)
+    {
+        var index=find_index(gameRooms,data);
+        if(index!=-1)
+            gameRooms.splice(index,1);
+        io.emit("showGameRooms",gameRooms);
+        io.sockets.in(data.room).emit('afterCloseOperation_auto',{room:data.room});
+        
+       // socket.emit('afterCloseOperation',data);
+    }
+    
+    socket.on('done',function(){
+        created--;
+    });
+    
+    
+    function startGame_auto(data)
+    {
+        
+        var a=Math.round(Math.random()*100);
+        var b=Math.round(Math.random()*100);
+        io.sockets.in(data.room).emit('setOnMark',{time:10000,a:a,b:b,room:data.room});
+        closeGamefun_auto(data);
+    }
     socket.on("joinThisRoom",function(data){
        socket.join(data.room);
         console.log("join: "+data.room);
@@ -131,8 +161,8 @@ io.on('connection', function (socket) {
        console.log(data.room+" : "+x);
         if(x>=4)
         {
-            closeGamefun(data);
-            startGame(data);
+            //closeGamefun(data);
+            startGame_auto(data);
             for(var clients in io.nsps['/'].adapter.rooms[data.room].sockets)
                 console.log(clients);
             //io.sockets.in(data.room).emit('error_msg',"Game is about to start ..");

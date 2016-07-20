@@ -102,11 +102,14 @@ $(function() {
         if(gameCreated)
            $userInThisRoom.html(username);
         
-        socket.emit("leaveRoom",data);
+        socket.emit("leaveRoom",{room:data.room});
     })
     socket.on('setOnMark',function(data){
         $("#gameRoom").hide();
         $("#gameController").hide();
+        $("#onlineUserDiv").hide();
+        if(socket.id==data.id)
+            gameCreated=false;
         $gameDisplayDiv.text("Game is starting in "+10+" sec...");
         //$inputAns.show();
         var count=data.time/1000-1;
@@ -118,6 +121,7 @@ $(function() {
                 count=data.time/1000-1;
                 clearInterval(timer);
                 $gameDisplayDiv.html("Game will end in "+10+"</br>"+data.a+" + "+data.b);
+                $inputAns.val("");
                 $inputAns.show();
                 var timer2=setInterval(function(){
                     if(count!=0)
@@ -130,6 +134,7 @@ $(function() {
                         $gameDisplayDiv.text("");
                         $("#gameRoom").show();
                         $("#gameController").show();
+                        $("#onlineUserDiv").show();
                     }
                 count--;
                 },1000);
@@ -149,13 +154,46 @@ $(function() {
        alert(data); 
     });
     
-    socket.on('afterCloseOperation',function(){
+    socket.on('afterCloseOperation',function(data){
        $startGameButton.hide();
        $closeGameButton.hide();
         $("#yourGameTitle").html("No Game");
         previousText="Join the game";
+        $("#onlineUserTitle").html(previousText);
+        $userInThisRoom.html("");
         gameCreated=false;
         console.log("After close "); 
+        socket.emit("leaveRoom",data);
+    });
+    
+    socket.on('afterCloseOperation_auto',function(data){
+        if(socket.id==data.room)
+        {
+            $startGameButton.hide();
+            $closeGameButton.hide();
+            $("#yourGameTitle").html("No Game");
+            previousText="Join the game";
+            $("#onlineUserTitle").html(previousText);
+            $userInThisRoom.html("");
+            gameCreated=false;
+            socket.emit('done');
+        }
+        
+        socket.emit("leaveRoom",data);    
+    });
+    
+    
+    socket.on('afterCloseOperation_room',function(data){
+  
+        $("#gameRoom").show();
+        $("#gameController").show();
+        $("#onlineUserTitle").html(previousText);
+        if(gameCreated)
+           $userInThisRoom.html(username);
+        else
+            $userInThisRoom.html("");
+        socket.emit("leaveRoom",data);
+         
     });
     
     socket.on('reconnect',function(){
